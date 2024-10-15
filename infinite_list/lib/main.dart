@@ -1,12 +1,11 @@
 import 'dart:io' show Platform;
-import 'dart:math';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:window_size/window_size.dart';
 import 'src/catalog.dart';
-import 'src/item_tile.dart';
 import 'src/api/item.dart';
+import 'src/item_tile.dart';
 
 void main() {
   setupWindow();
@@ -19,7 +18,7 @@ const double windowHeight = 854;
 void setupWindow() {
   if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
     WidgetsFlutterBinding.ensureInitialized();
-    setWindowTitle('Lista de Tarefas');
+    setWindowTitle('Task List');
     setWindowMinSize(const Size(windowWidth, windowHeight));
     setWindowMaxSize(const Size(windowWidth, windowHeight));
     getCurrentScreen().then((screen) {
@@ -40,7 +39,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider<Catalog>(
       create: (context) => Catalog(),
       child: MaterialApp(
-        title: 'Lista de Tarefas',
+        title: 'Task List',
         theme: ThemeData.light(),
         home: const MyHomePage(),
       ),
@@ -57,23 +56,27 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _controller = TextEditingController();
-  
-void _addTask() {
-  final taskText = _controller.text.trim();
-  if (taskText.isNotEmpty) {
-    // Gerar uma cor aleatória
-    final randomColor = Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0);
-    Provider.of<Catalog>(context, listen: false).addItem(Item(name: taskText, color: randomColor));
-    _controller.clear();
-  }
-}
 
+  void _addItem() {
+    final itemText = _controller.text.trim();
+    if (itemText.isNotEmpty) {
+      Provider.of<Catalog>(context, listen: false).addItem(
+        Item(
+          name: itemText,
+          color: Colors.primaries[Provider.of<Catalog>(context, listen: false)
+              .totalItemCount %
+              Colors.primaries.length],
+        ),
+      );
+      _controller.clear();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Lista de Tarefas'),
+        title: const Text('Task List'),
       ),
       body: Column(
         children: [
@@ -85,13 +88,13 @@ void _addTask() {
                   child: TextField(
                     controller: _controller,
                     decoration: const InputDecoration(
-                      labelText: 'Adicionar tarefa',
+                      labelText: 'Add task',
                     ),
                   ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.add),
-                  onPressed: _addTask,
+                  onPressed: _addItem,
                 ),
               ],
             ),
@@ -99,8 +102,8 @@ void _addTask() {
           Expanded(
             child: Selector<Catalog, int?>(
               selector: (context, catalog) => catalog.itemCount,
-              builder: (context, itemCount, child) => ListView.builder(
-                itemCount: itemCount,
+              builder: (context, itemCount, child) => ReorderableListView.builder(
+                itemCount: itemCount!,
                 padding: const EdgeInsets.symmetric(vertical: 18),
                 itemBuilder: (context, index) {
                   var catalog = Provider.of<Catalog>(context);
@@ -108,11 +111,22 @@ void _addTask() {
                   return Dismissible(
                     key: Key(item.name),
                     onDismissed: (direction) {
-                      Provider.of<Catalog>(context, listen: false).removeItem(item);
+                      Provider.of<Catalog>(context, listen: false)
+                          .removeItem(index);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Task "${item.name}" removed'),
+                        ),
+                      );
                     },
                     background: Container(color: Colors.red),
-                    child: ItemTile(item: item),
+                    child: ItemTile(item: item, index: index),
                   );
+                },
+                onReorder: (oldIndex, newIndex) {
+                  if (newIndex > oldIndex) newIndex--;
+                  Provider.of<Catalog>(context, listen: false)
+                      .reorderItem(oldIndex, newIndex);
                 },
               ),
             ),
