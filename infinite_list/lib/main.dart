@@ -18,7 +18,7 @@ const double windowHeight = 854;
 void setupWindow() {
   if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
     WidgetsFlutterBinding.ensureInitialized();
-    setWindowTitle('Task List');
+    setWindowTitle('Lista de tarefas');
     setWindowMinSize(const Size(windowWidth, windowHeight));
     setWindowMaxSize(const Size(windowWidth, windowHeight));
     getCurrentScreen().then((screen) {
@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider<Catalog>(
       create: (context) => Catalog(),
       child: MaterialApp(
-        title: 'Task List',
+        title: 'Lista de tarefas',
         theme: ThemeData.light(),
         home: const MyHomePage(),
       ),
@@ -76,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Task List'),
+        title: const Text('Lista de tarefas'),
       ),
       body: Column(
         children: [
@@ -88,7 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: TextField(
                     controller: _controller,
                     decoration: const InputDecoration(
-                      labelText: 'Add task',
+                      labelText: 'Adicionar tarefa',
                     ),
                   ),
                 ),
@@ -115,7 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           .removeItem(index);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('Task "${item.name}" removed'),
+                          content: Text('Tarefa "${item.name}" removida'),
                         ),
                       );
                     },
