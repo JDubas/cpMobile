@@ -2,7 +2,7 @@
 
 Este é um aplicativo simples de lista de tarefas (To-Do List) criado em Flutter. Ele permite que os usuários adicionem, excluam e organizem tarefas. O aplicativo também fornece uma interface visual agradável, com cores únicas atribuídas a cada tarefa.
 
-## ✨ Funcionalidades
+## ✨ Funcionalidades adicionadas ao projeto
 - **Adicionar tarefas**: Adicione novas tarefas à lista de maneira simples e rápida.
 - **Excluir tarefas**: Remova tarefas da lista clicando no botão "X" ao lado de cada item.
 - **Arrastar e soltar**: Reorganize as tarefas arrastando-as para a posição desejada.
